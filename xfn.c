@@ -21,6 +21,8 @@
 
 #include "xchat-plugin.h"
 #include <libnotify/notify.h>
+#include <ctype.h>
+#include <glib.h>
 
 /* You should find enough info about the following defines in
  * http://xchat.org/docs/plugin20.html 
@@ -34,6 +36,7 @@
 #define XFN_OFF    0
 #define XFN_ON     1
 #define XFN_STATUS 2
+#define XFN_NO_OP  3
 
 #define SUCCESS    1
 
@@ -45,6 +48,61 @@ static int xfn_status = XFN_ON;
  * the contents of the message sent to the user or not
  */
 static int xfn_display_message = XFN_OFF;
+
+/* custom functions */
+
+/* this function enables and disables the plugin without
+ * requiring the user to unload it */
+static int xfn_status_handler_cb(char *word[],
+                                 char *word_eol[],
+                                 void *userdata)
+{
+	if(word_eol[2][0] == 0) 
+	{
+		xchat_print(ph,"* requires a second argument");
+		xchat_command(ph,"HELP XFN");
+		return XCHAT_EAT_ALL;
+	}
+	
+	if( g_strcmp0(word[2],"STATUS") == 0 )
+	{
+		xchat_print(ph, xfn_status == XFN_ON ? "* xfn is on" : "* xfn is off");
+		return XCHAT_EAT_ALL;
+	}
+	
+	if( g_strcmp0(word[2], "ON") == 0 )
+	{
+		if( xfn_status == XFN_ON )
+		{
+			xchat_print(ph,"* xfn is already on");
+			return XCHAT_EAT_ALL;
+		}
+		
+		xfn_status = XFN_ON;
+		xchat_print(ph,"* xfn is now on");
+		return XCHAT_EAT_ALL;
+	}
+	
+	if( g_strcmp0(word[2], "OFF") == 0)
+	{
+		if( xfn_status == XFN_OFF )
+		{
+			xchat_print(ph,"* xfn is already off");
+			return XCHAT_EAT_ALL;
+		}
+		
+		xfn_status = XFN_OFF;
+		xchat_print(ph,"* xfn is now off");
+		return XCHAT_EAT_ALL;
+	}
+
+	xchat_print(ph,"* invalid option. remember that xfn commands are case sensitive");
+	xchat_command(ph,"HELP XFN");
+
+	return XCHAT_EAT_ALL;
+}/* end xfn_status_handler_cb */
+
+/* end of custom functions */
 
 /* let xchat know about us */
 void xchat_plugin_get_info(char **name, char **desc, 
@@ -72,9 +130,17 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
 	*plugin_name    = PNAME;
 	*plugin_desc    = PDESC;
 	*plugin_version = PVERSION;
+
+	/* adding commands that control the plugin behavior */
+	xchat_hook_command(ph,
+                       "XFN",
+                       XCHAT_PRI_NORM,
+                       xfn_status_handler_cb,
+                       "* usage:/XFN ON/OFF/STATUS\n**(turns the plugin on and off without unloading it)",
+                       NULL);
 	
 	/* let the user know everything ran ok */
-	xchat_print(ph, "XFN loaded_successfully!\n");
+	xchat_print(ph, "* XFN loaded_successfully!\n");
 	return SUCCESS;
 
 }/* end xchat_plugin_init */
@@ -86,6 +152,6 @@ int xchat_plugin_deinit()
 	notify_uninit();
 	
 	/* keep the user up to date */
-	xchat_print(ph, "XFN deinit successfully!\n");
+	xchat_print(ph, "* XFN deinit successfully!\n");
 	return SUCCESS;
 }
