@@ -46,8 +46,9 @@ static xchat_plugin *ph; /* plugin handle */
 static int xfn_status = XFN_ON;
 /* This flag controls if the notification should display
  * the contents of the message sent to the user or not
+ * xfn_dpm_status stands for xfn_display_message_status
  */
-static int xfn_display_message = XFN_OFF;
+static int xfn_dpm_status = XFN_OFF;
 
 /* custom functions */
 
@@ -102,6 +103,59 @@ static int xfn_status_handler_cb(char *word[],
 	return XCHAT_EAT_ALL;
 }/* end xfn_status_handler_cb */
 
+/* this functions handles the behavior of
+ * XFN_DPM ON | XFN_DPM OFF | XFN_DPM STATUS
+ * these commands allow the user to select determine
+ * if the content of the messages appear in 
+ * the notification or not.
+ */
+static int xfn_dpm_status_handler_cb(char *word[],
+                                     char *word_eol[],
+                                     void *userdata)
+{
+	if(word_eol[2][0] == 0)
+	{
+		xchat_print(ph,"* requires a second argument");
+		xchat_command(ph,"HELP XFN_DPM");
+		return XCHAT_EAT_ALL;
+	}
+	
+	if(g_strcmp0(word[2],"STATUS") == 0)
+	{
+		xchat_print(ph, xfn_dpm_status == XFN_ON ? "* xfn display message is on" : "* xfn display message is off");
+		return XCHAT_EAT_ALL;
+	}
+	
+	if( g_strcmp0(word[2],"ON") == 0 )
+	{
+		if(xfn_dpm_status == XFN_ON )
+		{
+			xchat_print(ph,"* xfn display message is already on");
+			return XCHAT_EAT_ALL;
+		}
+		xfn_dpm_status = XFN_ON;
+		xchat_print(ph,"* xfn display message is now on");
+		return XCHAT_EAT_ALL;
+	}
+	
+	if( g_strcmp0(word[2],"OFF") == 0 )
+	{
+		if( xfn_dpm_status == XFN_OFF )
+		{
+			xchat_print(ph,"* xfn display message is already off");
+			return XCHAT_EAT_ALL;
+		}
+		xfn_dpm_status = XFN_OFF;
+		xchat_print(ph,"* xfn display message is now off");
+		return XCHAT_EAT_ALL;
+	}
+	
+	xchat_print(ph,"* invalid option. remember that xfn commands are case sensitive");
+	xchat_command(ph,"HELP XFN_DPM");
+	
+	return XCHAT_EAT_ALL;
+}/* end xfn_dpm_status_handler_cb */
+
 /* end of custom functions */
 
 /* let xchat know about us */
@@ -138,6 +192,13 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        xfn_status_handler_cb,
                        "* usage:/XFN ON/OFF/STATUS\n**(turns the plugin on and off without unloading it)",
                        NULL);
+	
+	xchat_hook_command(ph,
+					   "XFN_DPM",
+					   XCHAT_PRI_NORM,
+					   xfn_dpm_status_handler_cb,
+					   "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications",
+					   NULL);
 	
 	/* let the user know everything ran ok */
 	xchat_print(ph, "* XFN loaded_successfully!\n");
