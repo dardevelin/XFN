@@ -215,10 +215,10 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        NULL);
 	
 	xchat_hook_command(ph,
-					   "XFN_DPM",
-					   XCHAT_PRI_NORM,
-					   xfn_dpm_status_handler_cb,
-					   "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications)",
+                       "XFN_DPM",
+                       XCHAT_PRI_NORM,
+                       xfn_dpm_status_handler_cb,
+                       "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications)",
 					   NULL);
 	
 	xchat_hook_command(ph,
