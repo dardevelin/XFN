@@ -40,6 +40,11 @@
 
 #define SUCCESS    1
 
+/*unix permission trick to get options in single int*/
+#define XFN_MODE_ACTIVE 1
+#define XFN_MODE_HIDDEN 2
+#define XFN_MODE_NORMAL 4
+#define XFN_MODE_ALWAYS (XFN_MODE_ACTIVE|XFN_MODE_NORMAL|XFN_MODE_HIDDEN)
 /* Globals */
 static xchat_plugin *ph; /* plugin handle */
 /* This flag acts as standbye switch for the entire plugin */
@@ -49,6 +54,11 @@ static int xfn_status = XFN_ON;
  * xfn_dpm_status stands for xfn_display_message_status
  */
 static int xfn_dpm_status = XFN_OFF;
+/* This flag controls if the notifications should be displayed
+ * only when the xchat window is active, 
+ * normal, hidden or at all times. XFN_MODE_ALWAYS is default
+ */
+static int xfn_mode_status = XFN_MODE_ALWAYS;
 
 /* custom functions */
 
@@ -156,6 +166,17 @@ static int xfn_dpm_status_handler_cb(char *word[],
 	return XCHAT_EAT_ALL;
 }/* end xfn_dpm_status_handler_cb */
 
+/* this functions controls in which window states
+ * the notification should be displayed.
+ * this functions responds to combinations of commands
+ */
+void xfn_mode_status_handler_cb(char *word[],
+                                char *word_eol[],
+                                void *userdata)
+{
+
+}/* end xfn_mode_status_handler_cb */
+
 /* end of custom functions */
 
 /* let xchat know about us */
@@ -197,11 +218,20 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
 					   "XFN_DPM",
 					   XCHAT_PRI_NORM,
 					   xfn_dpm_status_handler_cb,
-					   "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications",
+					   "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications)",
 					   NULL);
 	
+	xchat_hook_command(ph,
+                       "XFN_MODE",
+                       XCHAT_PRI_NORM,
+                       xfn_mode_status_handler_cb,
+                       "* usage:/XFN_MODE [ACTIVE/NORMAL/HIDDEN/]/ALWAYS\n"
+                       "** this command allows you to combine the multiple forms or simple use always for full combination\n"
+                       "**example: /XFN_MODE HIDDEN NORMAL",
+                       NULL);
+	
 	/* let the user know everything ran ok */
-	xchat_print(ph, "* XFN loaded_successfully!\n");
+	xchat_print(ph, "* XFN loaded successfully!\n");
 	return SUCCESS;
 
 }/* end xchat_plugin_init */
