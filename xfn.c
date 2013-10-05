@@ -237,11 +237,11 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        NULL);
 
 	/* the main hook that traps channel messages */
-	xchat_hook_command(ph,
-                       "Channel Message",
-                       XCHAT_PRI_NORM,
-                       xfn_chmsg_handler_cb,
-                       NULL);
+	xchat_hook_print(ph,
+                     "Channel Message",
+                     XCHAT_PRI_NORM,
+                     xfn_chmsg_handler_cb,
+                     NULL);
 	
 	/* let the user know everything ran ok */
 	xchat_print(ph, "* XFN loaded successfully!\n");
