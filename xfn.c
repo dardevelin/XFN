@@ -177,6 +177,13 @@ void xfn_mode_status_handler_cb(char *word[],
 
 }/* end xfn_mode_status_handler_cb */
 
+static int xfn_chmsg_handler_cb(char *word[],
+                                char *word_eol[],
+                                void *userdata)
+{
+
+}/* end xfn_chmsg_handler_cb */
+
 /* end of custom functions */
 
 /* let xchat know about us */
@@ -228,6 +235,13 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        "* usage:/XFN_MODE [ACTIVE/NORMAL/HIDDEN/]/ALWAYS\n"
                        "** this command allows you to combine the multiple forms or simple use always for full combination\n"
                        "**example: /XFN_MODE HIDDEN NORMAL",
+                       NULL);
+
+	/* the main hook that traps channel messages */
+	xchat_hook_command(ph,
+                       "Channel Message",
+                       XCHAT_PRI_NORM,
+                       xfn_chmsg_handler_cb,
                        NULL);
 	
 	/* let the user know everything ran ok */
