@@ -45,6 +45,8 @@
 #define XFN_MODE_HIDDEN 2
 #define XFN_MODE_NORMAL 4
 #define XFN_MODE_ALWAYS (XFN_MODE_ACTIVE|XFN_MODE_NORMAL|XFN_MODE_HIDDEN)
+#define XFN_MODE_UNKNOWN -1
+
 /* Globals */
 static xchat_plugin *ph; /* plugin handle */
 /* This flag acts as standbye switch for the entire plugin */
@@ -176,6 +178,32 @@ static void xfn_mode_status_handler_cb(char *word[],
 {
 
 }/* end xfn_mode_status_handler_cb */
+
+/* this function converts the xchat_get_info(ph,"win_status") 
+ * results into XFN_MODE masks so it separates 
+ * concerns on xfn_chmsg_handler_cb
+ */
+static int xfn_get_win_status_mask()
+{
+	const char *curr_status = xchat_get_info(ph,"win_status");
+
+	if( g_strcmp0("active", curr_status) == 0)
+	{
+		return XFN_MODE_ACTIVE;
+	}
+	
+	if( g_strcmp0("hidden", curr_status) == 0)
+	{
+		return XFN_MODE_HIDDEN;
+	}
+	
+	if( g_strcmp0("normal", curr_status) == 0)
+	{
+		return XFN_MODE_NORMAL;
+	}
+
+	return XFN_MODE_UNKNOWN;
+}/* end xfn_get_win_status_mask */
 
 static int xfn_chmsg_handler_cb(char *word[],
                                 char *word_eol[],
