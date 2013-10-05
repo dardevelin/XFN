@@ -170,9 +170,9 @@ static int xfn_dpm_status_handler_cb(char *word[],
  * the notification should be displayed.
  * this functions responds to combinations of commands
  */
-void xfn_mode_status_handler_cb(char *word[],
-                                char *word_eol[],
-                                void *userdata)
+static void xfn_mode_status_handler_cb(char *word[],
+                                       char *word_eol[],
+                                       void *userdata)
 {
 
 }/* end xfn_mode_status_handler_cb */
@@ -181,7 +181,6 @@ static int xfn_chmsg_handler_cb(char *word[],
                                 char *word_eol[],
                                 void *userdata)
 {
-
 }/* end xfn_chmsg_handler_cb */
 
 /* end of custom functions */
