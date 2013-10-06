@@ -20,7 +20,10 @@
  */
 
 #include "xchat-plugin.h"
+#include "glinked_list.h"
 #include <libnotify/notify.h>
+#include <stdbool.h>
+#include <string.h>
 #include <ctype.h>
 #include <glib.h>
 
@@ -61,8 +64,77 @@ static int xfn_dpm_status = XFN_OFF;
  * normal, hidden or at all times. XFN_MODE_ALWAYS is default
  */
 static int xfn_mode_status = XFN_MODE_ALWAYS;
-
+/* This is the nicknames list for the current session */
+static libglinked_list_t xfn_list;
 /* custom functions */
+
+/* This is an helper function to be used 
+ * with dbsglinked functions
+ */
+static bool nickname_cmp(void *a, void *b)
+{
+	if(g_strcmp0(a,b) == 0)
+		return TRUE;
+	
+	return FALSE;
+}
+
+/* This is an helper function that creates a copy
+ * of str. the new allocated string needs to be freed
+ */
+static char *sstrdup(const char *str)
+{
+    size_t l = strlen(str);
+    char *new;
+    if( (new = malloc(l+1)) == NULL )
+    {
+        return NULL;
+    }
+
+    memcpy(new,str,l);
+    new[l] = '\0';
+	return new;
+}
+
+/* This function is responsible for displaying the names
+ * stored in xfn_list
+ */
+static void print_name(void *data)
+{
+	xchat_printf(ph, " %s\n", (char*)data);
+}
+
+static int xfn_add_handler_cb(char *word[],
+                              char *word_eol[],
+                              void *userdata)
+{
+	return XCHAT_EAT_NONE;
+}/* end xfn_add_handler_cb */
+
+static int xfn_rm_handler_cb(char *word[],
+                             char *word_eol[],
+                             void *userdata)
+{
+	return XCHAT_EAT_NONE;
+}/* end xfn_rm_handler_cb */
+
+static int xfn_list_handler_cb(char *word[],
+                               char *word_eol[],
+                               void *userdata)
+{
+	size_t num = libglinked_get_num_items(&xfn_list);
+	if( num == 0 )
+	{
+		xchat_print(ph,"* xfn list is empty");
+		return XCHAT_EAT_NONE;
+	}
+	
+	xchat_print(ph,"* begining xfn list");
+	libglinked_show_list(&xfn_list, print_name);
+	xchat_print(ph,"* end xfn list");
+
+	return XCHAT_EAT_NONE;
+}/* end xfn_list_handler_cb */
 
 /* this function enables and disables the plugin without
  * requiring the user to unload it */
@@ -305,6 +377,27 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        "* usage:/XFN_MODE [ACTIVE/NORMAL/HIDDEN/]/ALWAYS\n"
                        "** this command allows you to combine the multiple forms or simple use always for full combination\n"
                        "**example: /XFN_MODE HIDDEN NORMAL",
+                       NULL);
+
+	xchat_hook_command(ph,
+                       "XFN_ADD",
+                       XCHAT_PRI_NORM,
+                       xfn_add_handler_cb,
+                       "* usage:/XFN_ADD nickname",
+                       NULL);
+
+	xchat_hook_command(ph,
+                       "XFN_RM",
+                       XCHAT_PRI_NORM,
+                       xfn_rm_handler_cb,
+                       "* usage:/XFN_RM nickname",
+                       NULL);
+
+	xchat_hook_command(ph,
+                       "XFN_LIST",
+                       XCHAT_PRI_NORM,
+                       xfn_list_handler_cb,
+                       "* usage:/XFN_LIST",
                        NULL);
 
 	/* the main hook that traps channel messages */
