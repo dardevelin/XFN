@@ -172,11 +172,11 @@ static int xfn_dpm_status_handler_cb(char *word[],
  * the notification should be displayed.
  * this functions responds to combinations of commands
  */
-static void xfn_mode_status_handler_cb(char *word[],
+static int xfn_mode_status_handler_cb(char *word[],
                                        char *word_eol[],
                                        void *userdata)
 {
-
+	return XCHAT_EAT_NONE;
 }/* end xfn_mode_status_handler_cb */
 
 /* this function converts the xchat_get_info(ph,"win_status") 
@@ -296,7 +296,7 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        XCHAT_PRI_NORM,
                        xfn_dpm_status_handler_cb,
                        "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications)",
-					   NULL);
+                       NULL);
 	
 	xchat_hook_command(ph,
                        "XFN_MODE",
