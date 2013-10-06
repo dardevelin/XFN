@@ -209,6 +209,50 @@ static int xfn_chmsg_handler_cb(char *word[],
                                 char *word_eol[],
                                 void *userdata)
 {
+	NotifyNotification *notify;
+	GError *error = NULL;
+	char buffer[128];
+	
+	const int curr_mode = xfn_get_win_status_mask();
+	
+	/* check if the plugin is not in standbye mode */
+	if(xfn_status != XFN_ON)
+		return XCHAT_EAT_NONE;
+	
+	/* check if we got the current mode properly */
+	if( curr_mode == XFN_MODE_UNKNOW )
+		return XCHAT_EAT_NONE;
+	
+	/* check if the current mode is allowed */
+	if( (xfn_mode_status & curr_mode ) == 0 )
+		return XCHAT_EAT_NONE;
+	
+	/* TODO */
+	/* check if the nickname is in the notify list */
+	
+	/* check if we are going to display the content of
+	 * the message or not
+	 */
+	if( xfn_dpm_status == XFN_ON )
+	{
+		/* show the message */
+		snprintf(buffer,128,"said: %s", word[2]);
+		notify = notify_notification_new(word[1],
+                                         buffer,
+                                         NULL/*icon*/);
+	}
+	else
+	{
+		snprintf(buffer,128,"from %s", word[1]);
+		notify = notify_notification_new("XFN MSG:",
+                                         buffer,
+                                         NULL/*icon*/);
+	}
+	
+	notify_notification_show(notify, &error);
+
+	return XCHAT_EAT_NONE;
+	
 }/* end xfn_chmsg_handler_cb */
 
 /* end of custom functions */
