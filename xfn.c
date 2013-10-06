@@ -108,14 +108,56 @@ static int xfn_add_handler_cb(char *word[],
                               char *word_eol[],
                               void *userdata)
 {
-	return XCHAT_EAT_NONE;
+	if(word_eol[2][0] == 0)
+	{
+		xchat_print(ph,"* requires a second argument");
+		xchat_command(ph,"HELP XFN_ADD");
+		return XCHAT_EAT_ALL;
+	}
+
+	if( libglinked_find_node(&xfn_list, word[2], nickname_cmp) != NULL )
+	{
+		xchat_printf(ph,"* %s is already added", word[2]);
+		return XCHAT_EAT_ALL;
+	}
+	
+	char *dupped = sstrdup(word[2]);
+	if(dupped != NULL)
+	{
+		libglinked_push_node(&xfn_list,
+                             libglinked_create_node(&xfn_list,
+                                                    dupped,
+                                                    free));
+		xchat_printf(ph,"* %s was added successfully", dupped);
+	}
+	else
+	{
+		xchat_printf(ph,"* wasn't able to insert %s", dupped);
+	}
+
+	return XCHAT_EAT_ALL;
 }/* end xfn_add_handler_cb */
 
 static int xfn_rm_handler_cb(char *word[],
                              char *word_eol[],
                              void *userdata)
 {
-	return XCHAT_EAT_NONE;
+	libglinked_node_t *node;
+
+	if(word_eol[2][0] == 0)
+	{
+		xchat_print(ph,"* requires a second argument");
+		xchat_command(ph,"HELP XFN_RM");
+		return XCHAT_EAT_ALL;
+	}
+
+	
+	node = libglinked_remove_node(&xfn_list,word[2],nickname_cmp);
+
+	libglinked_delete_node(&xfn_list, node);
+	
+	xchat_printf(ph,"* %s was removed successfully", word[2]);
+	return XCHAT_EAT_ALL;
 }/* end xfn_rm_handler_cb */
 
 static int xfn_list_handler_cb(char *word[],
