@@ -153,10 +153,20 @@ static int xfn_rm_handler_cb(char *word[],
 
 	
 	node = libglinked_remove_node(&xfn_list,word[2],nickname_cmp);
-
-	libglinked_delete_node(&xfn_list, node);
 	
-	xchat_printf(ph,"* %s was removed successfully", word[2]);
+	if(node != NULL)
+	{
+		libglinked_delete_node(&xfn_list, node);
+	
+		xchat_printf(ph,"* %s was removed successfully", word[2]);
+	}
+	else
+	{
+		xchat_printf(ph,
+        "* could not remove %s. are you sure %s in in the list ?",
+        word[2]);
+	}
+
 	return XCHAT_EAT_ALL;
 }/* end xfn_rm_handler_cb */
 
