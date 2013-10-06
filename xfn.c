@@ -389,6 +389,9 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
 	/* init libnotify, clean in deinit */
 	notify_init("XchatFriendNotify_plugin");
 	
+	/* init dbsglinked, so xfn_list can be used */
+	libglinked_init_list(&xfn_list, NULL, NULL);
+
 	/* save this in order to use xchat_* functions */
 	ph = plugin_handle;
 	
@@ -460,7 +463,8 @@ int xchat_plugin_deinit()
 {
 	/* disable libnotify */
 	notify_uninit();
-	
+	/* release allocated data by dbslibglinked */
+	libglinked_delete_list(&xfn_list);
 	/* keep the user up to date */
 	xchat_print(ph, "* XFN deinit successfully!\n");
 	return SUCCESS;
