@@ -220,7 +220,7 @@ static int xfn_chmsg_handler_cb(char *word[],
 		return XCHAT_EAT_NONE;
 	
 	/* check if we got the current mode properly */
-	if( curr_mode == XFN_MODE_UNKNOW )
+	if( curr_mode == XFN_MODE_UNKNOWN )
 		return XCHAT_EAT_NONE;
 	
 	/* check if the current mode is allowed */
