@@ -206,7 +206,6 @@ static int xfn_get_win_status_mask()
 }/* end xfn_get_win_status_mask */
 
 static int xfn_chmsg_handler_cb(char *word[],
-                                char *word_eol[],
                                 void *userdata)
 {
 	NotifyNotification *notify;
