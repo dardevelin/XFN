@@ -164,7 +164,7 @@ static int xfn_rm_handler_cb(char *word[],
 	{
 		xchat_printf(ph,
         "* could not remove %s. are you sure %s in in the list ?",
-        word[2]);
+		word[2], word[2]);
 	}
 
 	return XCHAT_EAT_ALL;
