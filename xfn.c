@@ -350,8 +350,12 @@ static int xfn_chmsg_handler_cb(char *word[],
 	if( (xfn_mode_status & curr_mode ) == 0 )
 		return XCHAT_EAT_NONE;
 	
-	/* TODO */
 	/* check if the nickname is in the notify list */
+	if( NULL == libglinked_find_node(&xfn_list, word[1], nickname_cmp) )
+	{
+		/* could not find the nickname, don't display the notification */
+		return XCHAT_EAT_NONE;
+	}
 	
 	/* check if we are going to display the content of
 	 * the message or not
