@@ -1,9 +1,6 @@
 This file contains a list of tasks that are intented to be
 executed in order to improve the plugin
 
-use xchat_nickcmp instead of nickname_cmp 
-^ probably requires dbsglinked list to be modified
-
 attemp to drop dbsglinked for a better data structure, or 
 use a point system with it, so the nicknames are sorted in order
 to reduce search time and improve plugin usability
