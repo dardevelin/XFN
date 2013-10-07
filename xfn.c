@@ -297,10 +297,92 @@ static int xfn_dpm_status_handler_cb(char *word[],
  * this functions responds to combinations of commands
  */
 static int xfn_mode_status_handler_cb(char *word[],
-                                       char *word_eol[],
-                                       void *userdata)
+                                      char *word_eol[],
+                                      void *userdata)
 {
-	return XCHAT_EAT_NONE;
+	if(word_eol[2][0] == 0)
+	{
+		xchat_print(ph,"* requires a second argument");
+		xchat_command(ph,"HELP XFN_MODE");
+		return XCHAT_EAT_ALL;
+	}
+	
+	/* this flag is set to 0, and is re-set to 0 
+	 * at the start of each cycle. if flag reaches value 5
+	 * it means it missed all possible params and so should 
+	 * warn the user
+	 */
+	int flag = 0;
+	int i;
+	for( i=2; i<=31; ++i )
+	{
+		flag = 0;
+		if(word[i][0] == 0)
+			break;
+		
+		if(g_strcmp0("STATUS", word[i]) == 0)
+		{
+			/* display the status and continue */
+			char buffer[128];
+			snprintf(buffer,128,"* XFN_MODE is set to [%s%s%s]\n",
+                     (xfn_mode_status & XFN_MODE_ACTIVE) == 0 ? "" : "ACTIVE ",
+                     (xfn_mode_status & XFN_MODE_HIDDEN) == 0 ? "" : "HIDDEN ",
+                     (xfn_mode_status & XFN_MODE_NORMAL) == 0 ? "" : "NORMAL ");
+			
+			xchat_print(ph,buffer);
+			continue;
+		}
+
+		++flag;
+		if(g_strcmp0("ACTIVE", word[i]) == 0)
+		{
+			if( (xfn_mode_status & XFN_MODE_ACTIVE) == 0 )
+			{
+				xfn_mode_status |= XFN_MODE_ACTIVE;
+			}
+			else
+			{
+				xfn_mode_status &= ~XFN_MODE_ACTIVE;
+			}
+			continue;
+		}
+		++flag;
+		if(g_strcmp0("HIDDEN", word[i]) == 0)
+		{
+			if( (xfn_mode_status & XFN_MODE_HIDDEN) == 0 )
+			{
+				xfn_mode_status |= XFN_MODE_HIDDEN;
+			}
+			else
+			{
+				xfn_mode_status &= ~XFN_MODE_HIDDEN;
+			}
+			continue;
+		}
+		++flag;
+		if(g_strcmp0("NORMAL", word[i]) == 0)
+		{
+			if( (xfn_mode_status & XFN_MODE_NORMAL) == 0 )
+			{
+				xfn_mode_status |= XFN_MODE_NORMAL;
+			}
+			else
+			{
+				xfn_mode_status &= ~XFN_MODE_NORMAL;
+			}
+			continue;
+		}
+		++flag;
+		if(flag == 4)
+		{
+			xchat_printf(ph, "* %s is an invalid option." 
+                             "remember xfn commands are case sensitive", word[i]);
+			continue;
+		}
+	}/*end for loop*/
+	
+	xchat_print(ph, "** XFN_MODE finished executing successfully\n");
+	return XCHAT_EAT_ALL;
 }/* end xfn_mode_status_handler_cb */
 
 /* this function converts the xchat_get_info(ph,"win_status") 
@@ -426,15 +508,17 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        "XFN_DPM",
                        XCHAT_PRI_NORM,
                        xfn_dpm_status_handler_cb,
-                       "* usage:/XFN_DPM ON/OFF/STATUS\n**(enables and disables the messages content on notifications)",
+                       "* usage:/XFN_DPM ON/OFF/STATUS\n"
+                       "**(enables and disables the messages content on notifications)",
                        NULL);
 	
 	xchat_hook_command(ph,
                        "XFN_MODE",
                        XCHAT_PRI_NORM,
                        xfn_mode_status_handler_cb,
-                       "* usage:/XFN_MODE [ACTIVE/NORMAL/HIDDEN/]/ALWAYS\n"
-                       "** this command allows you to combine the multiple forms or simple use always for full combination\n"
+                       "* usage:/XFN_MODE [ACTIVE/NORMAL/HIDDEN/]/STATUS\n"
+                       "** this command works in like toggle switchs\n"
+                       "** and allows you to combine the multiple options\n"
                        "**example: /XFN_MODE HIDDEN NORMAL",
                        NULL);
 
