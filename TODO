@@ -1,0 +1,18 @@
+This file contains a list of tasks that are intented to be
+executed in order to improve the plugin
+
+use xchat_nickcmp instead of nickname_cmp 
+^ probably requires dbsglinked list to be modified
+
+attemp to drop dbsglinked for a better data structure, or 
+use a point system with it, so the nicknames are sorted in order
+to reduce search time and improve plugin usability
+
+add a way to save settings and store the xfn_list across sessions
+
+add documentation to github repo
+build debian package with auto installation of the plugin
+
+As suggested by TingPing 
+use /tray -b and not libnotify directly in order to improve portability
+and allow other plugins to hook into it
