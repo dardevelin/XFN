@@ -1,7 +1,7 @@
 XFN - XCHAT FRIEND NOTIFY v1.0
 ===
 
-This is an xchat plugin written in C which add's a 
+This is an xchat plugin written in C which adds a 
 custom notification system to a selected list of
 nicknames/users across the channels you are logged in.
 
