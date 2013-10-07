@@ -73,10 +73,10 @@ static libglinked_list_t xfn_list;
  */
 static bool nickname_cmp(void *a, void *b)
 {
-	if(g_strcmp0(a,b) == 0)
-		return TRUE;
+	if( xchat_nickcmp(ph, a, b) == 0 )
+		return true;
 	
-	return FALSE;
+	return false;
 }
 
 /* This is an helper function that creates a copy
