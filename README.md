@@ -3,10 +3,10 @@ XFN - XCHAT FRIEND NOTIFY v1.0
 
 This is an xchat plugin written in C which adds a 
 custom notification system to a selected list of
-nicknames/users across the channels you are logged in.
+nicknames/users across the channels you are logged in to.
 
 Xchat already provides in it's options a way to use system
-notifications for private messages and highlights or pm's and you
+notifications for private messages and highlights or PM's and you
 rather prefer to get only balloon notifiations from few contacts.
 
 This plugin also allows you to choose between seeing the full
