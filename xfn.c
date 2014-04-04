@@ -28,7 +28,7 @@
 #include <glib.h>
 
 /* You should find enough info about the following defines in
- * http://xchat.org/docs/plugin20.html 
+ * http://xchat.org/docs/plugin20.html
  */
 #define PNAME "XFN - XCHAT FRIEND NOTIFY"
 #define PDESC \
@@ -60,7 +60,7 @@ static int xfn_status = XFN_ON;
  */
 static int xfn_dpm_status = XFN_OFF;
 /* This flag controls if the notifications should be displayed
- * only when the xchat window is active, 
+ * only when the xchat window is active,
  * normal, hidden or at all times. XFN_MODE_ALWAYS is default
  */
 static int xfn_mode_status = XFN_MODE_ALWAYS;
@@ -68,14 +68,14 @@ static int xfn_mode_status = XFN_MODE_ALWAYS;
 static libglinked_list_t xfn_list;
 /* custom functions */
 
-/* This is an helper function to be used 
+/* This is an helper function to be used
  * with dbsglinked functions
  */
 static bool nickname_cmp(void *a, void *b)
 {
 	if( xchat_nickcmp(ph, a, b) == 0 )
 		return true;
-	
+
 	return false;
 }
 
@@ -120,7 +120,7 @@ static int xfn_add_handler_cb(char *word[],
 		xchat_printf(ph,"* %s is already added", word[2]);
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	char *dupped = sstrdup(word[2]);
 	if(dupped != NULL)
 	{
@@ -133,6 +133,7 @@ static int xfn_add_handler_cb(char *word[],
 	else
 	{
 		xchat_printf(ph,"* wasn't able to insert %s", dupped);
+		free(dupped);
 	}
 
 	return XCHAT_EAT_ALL;
@@ -151,13 +152,13 @@ static int xfn_rm_handler_cb(char *word[],
 		return XCHAT_EAT_ALL;
 	}
 
-	
+
 	node = libglinked_remove_node(&xfn_list,word[2],nickname_cmp);
-	
+
 	if(node != NULL)
 	{
 		libglinked_delete_node(&xfn_list, node);
-	
+
 		xchat_printf(ph,"* %s was removed successfully", word[2]);
 	}
 	else
@@ -180,7 +181,7 @@ static int xfn_list_handler_cb(char *word[],
 		xchat_print(ph,"* xfn list is empty");
 		return XCHAT_EAT_NONE;
 	}
-	
+
 	xchat_print(ph,"* begining xfn list");
 	libglinked_show_list(&xfn_list, print_name);
 	xchat_print(ph,"* end xfn list");
@@ -194,19 +195,19 @@ static int xfn_status_handler_cb(char *word[],
                                  char *word_eol[],
                                  void *userdata)
 {
-	if(word_eol[2][0] == 0) 
+	if(word_eol[2][0] == 0)
 	{
 		xchat_print(ph,"* requires a second argument");
 		xchat_command(ph,"HELP XFN");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	if( g_strcmp0(word[2],"STATUS") == 0 )
 	{
 		xchat_print(ph, xfn_status == XFN_ON ? "* xfn is on" : "* xfn is off");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	if( g_strcmp0(word[2], "ON") == 0 )
 	{
 		if( xfn_status == XFN_ON )
@@ -214,12 +215,12 @@ static int xfn_status_handler_cb(char *word[],
 			xchat_print(ph,"* xfn is already on");
 			return XCHAT_EAT_ALL;
 		}
-		
+
 		xfn_status = XFN_ON;
 		xchat_print(ph,"* xfn is now on");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	if( g_strcmp0(word[2], "OFF") == 0)
 	{
 		if( xfn_status == XFN_OFF )
@@ -227,7 +228,7 @@ static int xfn_status_handler_cb(char *word[],
 			xchat_print(ph,"* xfn is already off");
 			return XCHAT_EAT_ALL;
 		}
-		
+
 		xfn_status = XFN_OFF;
 		xchat_print(ph,"* xfn is now off");
 		return XCHAT_EAT_ALL;
@@ -242,7 +243,7 @@ static int xfn_status_handler_cb(char *word[],
 /* this functions handles the behavior of
  * XFN_DPM ON | XFN_DPM OFF | XFN_DPM STATUS
  * these commands allow the user to select determine
- * if the content of the messages appear in 
+ * if the content of the messages appear in
  * the notification or not.
  */
 static int xfn_dpm_status_handler_cb(char *word[],
@@ -255,13 +256,13 @@ static int xfn_dpm_status_handler_cb(char *word[],
 		xchat_command(ph,"HELP XFN_DPM");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	if(g_strcmp0(word[2],"STATUS") == 0)
 	{
 		xchat_print(ph, xfn_dpm_status == XFN_ON ? "* xfn display message is on" : "* xfn display message is off");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	if( g_strcmp0(word[2],"ON") == 0 )
 	{
 		if(xfn_dpm_status == XFN_ON )
@@ -273,7 +274,7 @@ static int xfn_dpm_status_handler_cb(char *word[],
 		xchat_print(ph,"* xfn display message is now on");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	if( g_strcmp0(word[2],"OFF") == 0 )
 	{
 		if( xfn_dpm_status == XFN_OFF )
@@ -285,10 +286,10 @@ static int xfn_dpm_status_handler_cb(char *word[],
 		xchat_print(ph,"* xfn display message is now off");
 		return XCHAT_EAT_ALL;
 	}
-	
+
 	xchat_print(ph,"* invalid option. remember that xfn commands are case sensitive");
 	xchat_command(ph,"HELP XFN_DPM");
-	
+
 	return XCHAT_EAT_ALL;
 }/* end xfn_dpm_status_handler_cb */
 
@@ -306,10 +307,10 @@ static int xfn_mode_status_handler_cb(char *word[],
 		xchat_command(ph,"HELP XFN_MODE");
 		return XCHAT_EAT_ALL;
 	}
-	
-	/* this flag is set to 0, and is re-set to 0 
+
+	/* this flag is set to 0, and is re-set to 0
 	 * at the start of each cycle. if flag reaches value 5
-	 * it means it missed all possible params and so should 
+	 * it means it missed all possible params and so should
 	 * warn the user
 	 */
 	int flag = 0;
@@ -319,7 +320,7 @@ static int xfn_mode_status_handler_cb(char *word[],
 		flag = 0;
 		if(word[i][0] == 0)
 			break;
-		
+
 		if(g_strcmp0("STATUS", word[i]) == 0)
 		{
 			/* display the status and continue */
@@ -328,7 +329,7 @@ static int xfn_mode_status_handler_cb(char *word[],
                      (xfn_mode_status & XFN_MODE_ACTIVE) == 0 ? "" : "ACTIVE ",
                      (xfn_mode_status & XFN_MODE_HIDDEN) == 0 ? "" : "HIDDEN ",
                      (xfn_mode_status & XFN_MODE_NORMAL) == 0 ? "" : "NORMAL ");
-			
+
 			xchat_print(ph,buffer);
 			continue;
 		}
@@ -375,18 +376,18 @@ static int xfn_mode_status_handler_cb(char *word[],
 		++flag;
 		if(flag == 4)
 		{
-			xchat_printf(ph, "* %s is an invalid option." 
+			xchat_printf(ph, "* %s is an invalid option."
                              "remember xfn commands are case sensitive", word[i]);
 			continue;
 		}
 	}/*end for loop*/
-	
+
 	xchat_print(ph, "** XFN_MODE finished executing successfully\n");
 	return XCHAT_EAT_ALL;
 }/* end xfn_mode_status_handler_cb */
 
-/* this function converts the xchat_get_info(ph,"win_status") 
- * results into XFN_MODE masks so it separates 
+/* this function converts the xchat_get_info(ph,"win_status")
+ * results into XFN_MODE masks so it separates
  * concerns on xfn_chmsg_handler_cb
  */
 static int xfn_get_win_status_mask()
@@ -397,12 +398,12 @@ static int xfn_get_win_status_mask()
 	{
 		return XFN_MODE_ACTIVE;
 	}
-	
+
 	if( g_strcmp0("hidden", curr_status) == 0)
 	{
 		return XFN_MODE_HIDDEN;
 	}
-	
+
 	if( g_strcmp0("normal", curr_status) == 0)
 	{
 		return XFN_MODE_NORMAL;
@@ -417,28 +418,28 @@ static int xfn_chmsg_handler_cb(char *word[],
 	NotifyNotification *notify;
 	GError *error = NULL;
 	char buffer[128];
-	
+
 	const int curr_mode = xfn_get_win_status_mask();
-	
+
 	/* check if the plugin is not in standbye mode */
 	if(xfn_status != XFN_ON)
 		return XCHAT_EAT_NONE;
-	
+
 	/* check if we got the current mode properly */
 	if( curr_mode == XFN_MODE_UNKNOWN )
 		return XCHAT_EAT_NONE;
-	
+
 	/* check if the current mode is allowed */
 	if( (xfn_mode_status & curr_mode ) == 0 )
 		return XCHAT_EAT_NONE;
-	
+
 	/* check if the nickname is in the notify list */
 	if( NULL == libglinked_find_node(&xfn_list, word[1], nickname_cmp) )
 	{
 		/* could not find the nickname, don't display the notification */
 		return XCHAT_EAT_NONE;
 	}
-	
+
 	/* check if we are going to display the content of
 	 * the message or not
 	 */
@@ -457,17 +458,17 @@ static int xfn_chmsg_handler_cb(char *word[],
                                          buffer,
                                          NULL/*icon*/);
 	}
-	
+
 	notify_notification_show(notify, &error);
 
 	return XCHAT_EAT_NONE;
-	
+
 }/* end xfn_chmsg_handler_cb */
 
 /* end of custom functions */
 
 /* let xchat know about us */
-void xchat_plugin_get_info(char **name, char **desc, 
+void xchat_plugin_get_info(char **name, char **desc,
                            char **version, void **reserved)
 {
 	*name = PNAME;
@@ -484,13 +485,13 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
 {
 	/* init libnotify, clean in deinit */
 	notify_init("XchatFriendNotify_plugin");
-	
+
 	/* init dbsglinked, so xfn_list can be used */
 	libglinked_init_list(&xfn_list, NULL, NULL);
 
 	/* save this in order to use xchat_* functions */
 	ph = plugin_handle;
-	
+
 	/* tell xchat our info */
 	*plugin_name    = PNAME;
 	*plugin_desc    = PDESC;
@@ -503,7 +504,7 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        xfn_status_handler_cb,
                        "* usage:/XFN ON/OFF/STATUS\n**(turns the plugin on and off without unloading it)",
                        NULL);
-	
+
 	xchat_hook_command(ph,
                        "XFN_DPM",
                        XCHAT_PRI_NORM,
@@ -511,7 +512,7 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                        "* usage:/XFN_DPM ON/OFF/STATUS\n"
                        "**(enables and disables the messages content on notifications)",
                        NULL);
-	
+
 	xchat_hook_command(ph,
                        "XFN_MODE",
                        XCHAT_PRI_NORM,
@@ -549,7 +550,7 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
                      XCHAT_PRI_NORM,
                      xfn_chmsg_handler_cb,
                      NULL);
-	
+
 	/* let the user know everything ran ok */
 	xchat_print(ph, "* XFN loaded successfully!\n");
 	return SUCCESS;
